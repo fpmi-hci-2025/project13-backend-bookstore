@@ -1,0 +1,866 @@
+{
+	"info": {
+		"_postman_id": "bookstore-api-collection",
+		"name": "BookStore API",
+		"description": "API для книжного онлайн-магазина",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://bookstore-api-m4ix.onrender.com",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set('token', jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "register"]
+						},
+						"description": "Регистрация нового пользователя"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set('token', jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "login"]
+						},
+						"description": "Вход в систему"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "me"]
+						},
+						"description": "Получить профиль текущего пользователя"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Books",
+			"item": [
+				{
+					"name": "Get All Books",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/books?page=1&page_size=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "books"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Получить список всех книг с пагинацией"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Book by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/books/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "books", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "book-uuid-here"
+								}
+							]
+						},
+						"description": "Получить книгу по ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Books",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/books/search?q=war&page=1&page_size=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "books", "search"],
+							"query": [
+								{
+									"key": "q",
+									"value": "war"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Поиск книг по названию или описанию"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Book",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"The Art of War\",\n    \"author_id\": \"author-uuid-here\",\n    \"genre\": \"Philosophy\",\n    \"price\": 24.99,\n    \"stock\": 100,\n    \"image_url\": \"https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=600&q=80\",\n    \"description\": \"Ancient Chinese military treatise\",\n    \"publisher\": \"Classic Press\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/books",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "books"]
+						},
+						"description": "Создать новую книгу (требуется авторизация)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Book",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"The Art of War - Updated Edition\",\n    \"price\": 29.99,\n    \"stock\": 150\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/books/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "books", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "book-uuid-here"
+								}
+							]
+						},
+						"description": "Обновить книгу (требуется авторизация)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Book",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/books/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "books", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "book-uuid-here"
+								}
+							]
+						},
+						"description": "Удалить книгу (требуется авторизация)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Book Reviews",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/books/:id/reviews?page=1&page_size=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "books", ":id", "reviews"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "book-uuid-here"
+								}
+							]
+						},
+						"description": "Получить отзывы на книгу"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authors",
+			"item": [
+				{
+					"name": "Get All Authors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/authors?page=1&page_size=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "authors"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Получить список всех авторов"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Author by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/authors/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "authors", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "author-uuid-here"
+								}
+							]
+						},
+						"description": "Получить автора по ID с его книгами"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Author",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Sun Tzu\",\n    \"role\": \"Writer\",\n    \"image_url\": \"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80\",\n    \"biography\": \"Ancient Chinese military strategist and philosopher\",\n    \"rating\": 4.8\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/authors",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "authors"]
+						},
+						"description": "Создать нового автора (требуется авторизация)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Author",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Sun Tzu\",\n    \"biography\": \"Updated biography text\",\n    \"rating\": 4.9\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/authors/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "authors", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "author-uuid-here"
+								}
+							]
+						},
+						"description": "Обновить автора (требуется авторизация)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Author",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/authors/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "authors", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "author-uuid-here"
+								}
+							]
+						},
+						"description": "Удалить автора (требуется авторизация)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "Get Cart",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/cart",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "cart"]
+						},
+						"description": "Получить корзину пользователя"
+					},
+					"response": []
+				},
+				{
+					"name": "Add to Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"book_id\": \"book-uuid-here\",\n    \"quantity\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/cart",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "cart"]
+						},
+						"description": "Добавить книгу в корзину"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Cart Item",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/cart/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "cart", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "cart-item-uuid-here"
+								}
+							]
+						},
+						"description": "Обновить количество товара в корзине"
+					},
+					"response": []
+				},
+				{
+					"name": "Remove from Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/cart/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "cart", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "cart-item-uuid-here"
+								}
+							]
+						},
+						"description": "Удалить товар из корзины"
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/cart",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "cart"]
+						},
+						"description": "Очистить корзину"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Get Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/orders?page=1&page_size=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "orders"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "page_size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Получить список заказов пользователя"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/orders/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "orders", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "order-uuid-here"
+								}
+							]
+						},
+						"description": "Получить заказ по ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"delivery_address\": \"ул. Примерная, д. 123, кв. 45, Минск, Беларусь\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "orders"]
+						},
+						"description": "Создать заказ из корзины"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/orders/:id/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "orders", ":id", "cancel"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "order-uuid-here"
+								}
+							]
+						},
+						"description": "Отменить заказ (только pending заказы)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Favorites",
+			"item": [
+				{
+					"name": "Get Favorites",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/favorites",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "favorites"]
+						},
+						"description": "Получить список избранных книг"
+					},
+					"response": []
+				},
+				{
+					"name": "Add to Favorites",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"book_id\": \"book-uuid-here\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/favorites",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "favorites"]
+						},
+						"description": "Добавить книгу в избранное"
+					},
+					"response": []
+				},
+				{
+					"name": "Remove from Favorites",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/favorites/:book_id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "favorites", ":book_id"],
+							"variable": [
+								{
+									"key": "book_id",
+									"value": "book-uuid-here"
+								}
+							]
+						},
+						"description": "Удалить книгу из избранного"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reviews",
+			"item": [
+				{
+					"name": "Create Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"book_id\": \"book-uuid-here\",\n    \"rating\": 5,\n    \"comment\": \"Отличная книга! Очень рекомендую.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/reviews",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "reviews"]
+						},
+						"description": "Создать отзыв на книгу"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Review",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 4,\n    \"comment\": \"Обновленный комментарий\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/reviews/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "reviews", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "review-uuid-here"
+								}
+							]
+						},
+						"description": "Обновить свой отзыв"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Review",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/reviews/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "reviews", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "review-uuid-here"
+								}
+							]
+						},
+						"description": "Удалить свой отзыв"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/health",
+					"host": ["{{baseUrl}}"],
+					"path": ["health"]
+				},
+				"description": "Проверка работоспособности API"
+			},
+			"response": []
+		}
+	]
+}
+
