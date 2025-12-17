@@ -93,3 +93,38 @@ func (h *Handler) GetProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+// UpdateProfile godoc
+// @Summary Update current user profile
+// @Description Update the profile of the authenticated user
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body service.UpdateProfileRequest true "Profile update details"
+// @Success 200 {object} domain.User
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Failure 409 {object} map[string]string
+// @Router /me [put]
+func (h *Handler) UpdateProfile(c *gin.Context) {
+	userID := middleware.GetUserID(c)
+
+	var req service.UpdateProfileRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := h.authService.UpdateProfile(c.Request.Context(), userID, &req)
+	if err != nil {
+		if errors.Is(err, domain.ErrUserAlreadyExists) {
+			c.JSON(http.StatusConflict, gin.H{"error": "Username or email already taken"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update profile"})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+

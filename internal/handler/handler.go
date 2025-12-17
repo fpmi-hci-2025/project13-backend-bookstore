@@ -105,6 +105,7 @@ func (h *Handler) SetupRoutes() *gin.Engine {
 		{
 			// User profile
 			protected.GET("/me", h.GetProfile)
+			protected.PUT("/me", h.UpdateProfile)
 
 			// Cart
 			cart := protected.Group("/cart")

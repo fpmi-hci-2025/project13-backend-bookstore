@@ -34,6 +34,11 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type UpdateProfileRequest struct {
+	Username string `json:"username" binding:"omitempty,min=3,max=50"`
+	Email    string `json:"email" binding:"omitempty,email"`
+}
+
 type AuthResponse struct {
 	Token string       `json:"token"`
 	User  *domain.User `json:"user"`
@@ -105,6 +110,39 @@ func (s *AuthService) Login(ctx context.Context, req *LoginRequest) (*AuthRespon
 
 func (s *AuthService) GetUserByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
 	return s.userRepo.GetByID(ctx, id)
+}
+
+func (s *AuthService) UpdateProfile(ctx context.Context, userID uuid.UUID, req *UpdateProfileRequest) (*domain.User, error) {
+	user, err := s.userRepo.GetByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if email is being changed and if it's already taken
+	if req.Email != "" && req.Email != user.Email {
+		existing, _ := s.userRepo.GetByEmail(ctx, req.Email)
+		if existing != nil && existing.ID != userID {
+			return nil, domain.ErrUserAlreadyExists
+		}
+		user.Email = req.Email
+	}
+
+	// Check if username is being changed and if it's already taken
+	if req.Username != "" && req.Username != user.Username {
+		existing, _ := s.userRepo.GetByUsername(ctx, req.Username)
+		if existing != nil && existing.ID != userID {
+			return nil, domain.ErrUserAlreadyExists
+		}
+		user.Username = req.Username
+	}
+
+	user.UpdatedAt = time.Now()
+
+	if err := s.userRepo.Update(ctx, user); err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s *AuthService) generateToken(userID uuid.UUID) (string, error) {
