@@ -76,7 +76,7 @@ func main() {
 	bookService := service.NewBookService(bookRepo)
 	authorService := service.NewAuthorService(authorRepo, bookRepo)
 	orderService := service.NewOrderService(orderRepo, cartRepo, bookRepo)
-	reviewService := service.NewReviewService(reviewRepo)
+	reviewService := service.NewReviewService(reviewRepo, bookRepo)
 	cartService := service.NewCartService(cartRepo, bookRepo)
 	favoriteService := service.NewFavoriteService(favoriteRepo)
 

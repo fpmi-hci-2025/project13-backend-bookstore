@@ -11,10 +11,14 @@ import (
 
 type ReviewService struct {
 	reviewRepo repository.ReviewRepository
+	bookRepo   repository.BookRepository
 }
 
-func NewReviewService(reviewRepo repository.ReviewRepository) *ReviewService {
-	return &ReviewService{reviewRepo: reviewRepo}
+func NewReviewService(reviewRepo repository.ReviewRepository, bookRepo repository.BookRepository) *ReviewService {
+	return &ReviewService{
+		reviewRepo: reviewRepo,
+		bookRepo:   bookRepo,
+	}
 }
 
 type CreateReviewRequest struct {
@@ -46,6 +50,12 @@ func (s *ReviewService) Create(ctx context.Context, userID uuid.UUID, req *Creat
 
 	if err := s.reviewRepo.Create(ctx, review); err != nil {
 		return nil, err
+	}
+
+	// Update book rating
+	if err := s.bookRepo.UpdateRating(ctx, req.BookID); err != nil {
+		// Log error but don't fail the request
+		// The review was created successfully
 	}
 
 	return review, nil
@@ -86,6 +96,11 @@ func (s *ReviewService) Update(ctx context.Context, id uuid.UUID, userID uuid.UU
 		return nil, err
 	}
 
+	// Update book rating
+	if err := s.bookRepo.UpdateRating(ctx, review.BookID); err != nil {
+		// Log error but don't fail the request
+	}
+
 	return review, nil
 }
 
@@ -100,6 +115,16 @@ func (s *ReviewService) Delete(ctx context.Context, id uuid.UUID, userID uuid.UU
 		return domain.ErrForbidden
 	}
 
-	return s.reviewRepo.Delete(ctx, id)
-}
+	bookID := review.BookID
 
+	if err := s.reviewRepo.Delete(ctx, id); err != nil {
+		return err
+	}
+
+	// Update book rating
+	if err := s.bookRepo.UpdateRating(ctx, bookID); err != nil {
+		// Log error but don't fail the request
+	}
+
+	return nil
+}
